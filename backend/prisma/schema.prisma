@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String    @unique
+  password  String
+  type      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Course {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  desc        String
+  banner      String
+  user        String
+  price       Int
+  lectures    Lecture[]
+  enrollments Enrollment[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Lecture {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  link        String
+  desc        String
+  course      Course    @relation(fields: [courseId],references: [id])
+  courseId    String     @db.ObjectId
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Student {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  email       String    @unique
+  password    String
+  enrollments Enrollment[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Enrollment {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  student       Student     @relation(fields: [studentId], references: [id])
+  studentId     String      @db.ObjectId
+  studentEmail  String
+  course        Course      @relation(fields: [courseId], references: [id])
+  courseId      String      @db.ObjectId
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
